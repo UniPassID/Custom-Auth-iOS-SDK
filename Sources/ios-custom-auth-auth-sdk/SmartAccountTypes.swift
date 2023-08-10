@@ -23,22 +23,26 @@ public enum ChainID: UInt64 {
 public protocol Signer {
     func address() -> String
 
-    func signMessage(message: Data) -> String
+    func signMessage(message: Data) throws -> String
 }
 
-public protocol SignerExt {
-    func signMessage(message: String) -> String
-}
-
-public extension Signer where Self:web3.EthereumAccountProtocol{
-        
-}
-
-public extension SignerExt where Self: Signer{
-    func signMessage(message: String) -> String{
-        return self.signMessage(message: message.data(using: String.Encoding.utf8)!);
+public extension Signer{
+    func signMessage(message: String) throws -> String{
+        return try self.signMessage(message: message.data(using: String.Encoding.utf8)!);
     }
 }
+
+extension web3.EthereumAccount:Signer{
+    public func address() ->String{
+        return self.address.asString()
+    }
+
+    public func signMessage(message: Data) throws -> String {
+        return try (self as EthereumAccountProtocol).signMessage(message: message)
+    }
+}
+
+
 
 public struct ChainOptions {
     public var chainId: ChainID = ChainID.ETHEREUM_MAINNET
@@ -87,7 +91,7 @@ internal class WrapSigner: Shared.Signer {
     }
 
    public func signMessage(_ message: [UInt8]) throws -> String {
-        return self.signer.signMessage(message: Data(message));
+        return try self.signer.signMessage(message: Data(message));
     }
 }
 
