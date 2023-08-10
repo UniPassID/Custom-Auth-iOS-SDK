@@ -51,7 +51,7 @@ public struct SmartAccountOptions {
 }
 
 public struct SmartAccountInitOptions{
-    var chainId:ChainID
+    public var chainId:ChainID
 }
 
 internal class WrapSigner: Shared.Signer {
