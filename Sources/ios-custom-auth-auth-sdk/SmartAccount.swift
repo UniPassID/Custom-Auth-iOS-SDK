@@ -104,4 +104,10 @@ public class SmartAccount {
         
         return try await self.inner!.waitForTransaction(transactionHash)
     }
+    
+    public func getKeysetJson() throws -> String{
+        try requireInit()
+        
+        return self.inner!.keysetJson()
+    }
 }
