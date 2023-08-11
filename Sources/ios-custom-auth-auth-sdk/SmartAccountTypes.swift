@@ -32,7 +32,7 @@ public extension Signer{
     }
 }
 
-extension web3.EthereumAccount:Signer{
+public extension web3.EthereumAccount:Signer{
     public func address() ->String{
         return self.address.asString()
     }
@@ -95,6 +95,6 @@ internal class WrapSigner: Shared.Signer {
     }
 }
 
-enum SmartAccountError: String, Error{
-    case expectedInit = "Expected Smart Account to Initalize"
+public enum SmartAccountError: String, Error{
+    case expectedInit = "Expected Smart Account to Initialize"
 }
