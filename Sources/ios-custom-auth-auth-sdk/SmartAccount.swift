@@ -99,7 +99,9 @@ public class SmartAccount {
         return try await inner!.sendTransactions(transactions, options)
     }
     
-    public func waitTransactionReceiptByHash(transactionHash:String,confirmations:Int,chainId:ChainID?,timeout:Int) async throws -> Shared.TransactionReceipt?{
+
+    
+    public func waitTransactionReceiptByHash(transactionHash:String) async throws -> Shared.TransactionReceipt?{
         try requireInit()
         
         return try await self.inner!.waitForTransaction(transactionHash)
