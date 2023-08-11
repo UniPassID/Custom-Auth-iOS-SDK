@@ -7,7 +7,7 @@
 
 import Foundation
 import GenericJSON
-import Shared
+@_exported import Shared
 import web3
 
 public protocol TypedDataExtendable {

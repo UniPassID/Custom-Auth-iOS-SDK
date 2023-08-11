@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import Shared
+@_exported import Shared
 import web3
 
 public enum ChainID: UInt64 {
