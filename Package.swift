@@ -10,7 +10,7 @@ let url = "https://github.com/UniPassID/ios-custom-auth-sdk/releases/download/\(
 let package = Package(
   name: "ios-custom-auth-auth-sdk",
   platforms: [
-    .iOS(.v15),
+    .iOS(.v13),
     .macOS(.v12)
   ],
   products: [
