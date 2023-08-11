@@ -28,7 +28,7 @@ public class SmartAccount {
         }
     }
 
-    public func initalize(options: SmartAccountInitOptions) async throws {
+    public func initialize(options: SmartAccountInitOptions) async throws {
         builder = builder!.withActiveChain(options.chainId.rawValue)
         inner = try await builder?.build()
         builder = nil
@@ -61,7 +61,7 @@ public class SmartAccount {
 
     public func signMessage(message: String) async throws -> String {
         try requireInit()
-        return String(bytes: try await inner!.signMessage(try message.bytes))
+        return String(bytes: try await inner!.signMessage(Array(message.utf8)))
     }
 
     public func signMessage(message: Data) async throws -> String {
