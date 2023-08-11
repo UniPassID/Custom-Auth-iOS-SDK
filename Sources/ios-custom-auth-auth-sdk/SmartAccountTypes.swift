@@ -32,7 +32,7 @@ public extension Signer{
     }
 }
 
-public extension web3.EthereumAccount:Signer{
+extension web3.EthereumAccount:Signer{
     public func address() ->String{
         return self.address.asString()
     }
@@ -91,7 +91,7 @@ internal class WrapSigner: Shared.Signer {
     }
 
    public func signMessage(_ message: [UInt8]) throws -> String {
-        return try self.signer.signMessage(message: Data(message));
+        return try (self.signer as Signer).signMessage(message: Data(message));
     }
 }
 
