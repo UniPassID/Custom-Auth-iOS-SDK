@@ -3,8 +3,8 @@
 
 import PackageDescription
 
-let checksum = "cc5573c75cf742fba2900ae82cfe877da712699e73ed6836655c65d994b93d5c"
-let version = "v0.0.1-alpha.0"
+let checksum = "f42ba2c6d66c8429c8798118cf1ebf82c8e321cbf269a7947ac362f8c1472685"
+let version = "v0.0.1-alpha.1"
 let url = "https://github.com/UniPassID/ios-custom-auth-sdk/releases/download/\(version)/SharedFFI.xcframework.zip"
 
 let package = Package(
