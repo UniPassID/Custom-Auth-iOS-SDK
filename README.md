@@ -1,1 +1,2 @@
-# ios-custom-auth-sdk
+# iOS UniPass Custom Auth SDK
+

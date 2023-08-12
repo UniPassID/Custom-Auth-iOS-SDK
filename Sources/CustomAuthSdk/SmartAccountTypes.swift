@@ -2,7 +2,6 @@
 //  SmartAccountTypes.swift
 //  CustomAuthSDK
 //
-//  Created by johnz on 2023/8/7.
 //
 
 import Foundation
