@@ -5,7 +5,7 @@
 Use Xcode to add to the project (File -> Swift Packages) or add this to your Package.swift file:
 
 ```bash
-.package(url: "https://github.com/UniPassID/Custom-Auth-iOS-SDK.git", from: "0.0.1-alpha.19")
+.package(url: "https://github.com/UniPassID/Custom-Auth-iOS-SDK.git", from: "0.0.1-alpha.20")
 ```
 
 ## Initialize Smart Account
