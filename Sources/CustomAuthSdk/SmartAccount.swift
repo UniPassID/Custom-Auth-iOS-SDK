@@ -84,7 +84,7 @@ public class SmartAccount {
     public func simulateTransaction(transaction: Shared.Transaction, options: SimulateTransactionOptions?) async throws -> SimulateResult {
         try requireInit()
 
-        return try await inner!.simulateTransactions(transactions: [transaction], simulateOptions: options == nil ? Shared.SimulateTransactionOptions(token: options!.token, chain: options!.chain): nil)
+        return try await inner!.simulateTransactions(transactions: [transaction], simulateOptions: options == nil ? Shared.SimulateTransactionOptions(token: options!.token, chain: options!.chain) : nil)
     }
 
     public func simulateTransaction(transaction: Shared.Transaction) async throws -> SimulateResult {
@@ -96,7 +96,7 @@ public class SmartAccount {
     public func simulateTransactionBatch(transactions: [Shared.Transaction], options: SimulateTransactionOptions?) async throws -> SimulateResult {
         try requireInit()
 
-        return try await inner!.simulateTransactions(transactions: transactions, simulateOptions: options == nil ? Shared.SimulateTransactionOptions(token: options!.token, chain: options!.chain): nil)
+        return try await inner!.simulateTransactions(transactions: transactions, simulateOptions: options == nil ? Shared.SimulateTransactionOptions(token: options!.token, chain: options!.chain) : nil)
     }
 
     public func simulateTransactionBatch(transactions: [Shared.Transaction]) async throws -> SimulateResult {
@@ -108,7 +108,7 @@ public class SmartAccount {
     public func sendTransaction(transaction: Shared.Transaction, options: SendingTransactionOptions?) async throws -> String {
         try requireInit()
 
-        return try await inner!.sendTransactions(transactions: [transaction], options: options == nil ? Shared.SendingTransactionOptions(fee: options!.fee, chain: options!.chain): nil)
+        return try await inner!.sendTransactions(transactions: [transaction], options: options == nil ? Shared.SendingTransactionOptions(fee: options!.fee, chain: options!.chain) : nil)
     }
 
     public func sendTransaction(transaction: Shared.Transaction) async throws -> String {
@@ -120,7 +120,7 @@ public class SmartAccount {
     public func sendTransactionBatch(transactions: [Shared.Transaction], options: SendingTransactionOptions?) async throws -> String {
         try requireInit()
 
-        return try await inner!.sendTransactions(transactions: transactions, options:options == nil ? Shared.SendingTransactionOptions(fee: options!.fee, chain: options!.chain): nil)
+        return try await inner!.sendTransactions(transactions: transactions, options: options == nil ? Shared.SendingTransactionOptions(fee: options!.fee, chain: options!.chain) : nil)
     }
 
     public func sendTransactionBatch(transactions: [Shared.Transaction]) async throws -> String {

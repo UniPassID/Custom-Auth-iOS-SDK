@@ -109,7 +109,7 @@ public struct SendingTransactionOptions {
         self.chain = chain
     }
 
-     public init(_ fee: FeeOption?) {
+     public init(fee: FeeOption?) {
         self.fee = fee
         self.chain = nil
     }
