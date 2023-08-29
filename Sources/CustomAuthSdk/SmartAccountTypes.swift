@@ -89,7 +89,7 @@ internal class WrapSigner: Shared.Signer {
         return self.signer.address()
     }
 
-   public func signMessage(_ message: [UInt8]) throws -> String {
+   public func signMessage(message: [UInt8]) throws -> String {
         return try (self.signer as Signer).signMessage(message: Data(message));
     }
 }

@@ -412,13 +412,15 @@ public protocol SmartAccountProtocol {
     func isDeployed() async throws -> Bool
     func keysetJson() -> String
     func nonce() async throws -> UInt64
-    func sendTransactions(_ transactions: [Transaction], _ options: SendingTransactionOptions?) async throws -> String
-    func signHash(_ hash: [UInt8]) async throws -> [UInt8]
-    func signMessage(_ message: [UInt8]) async throws -> [UInt8]
-    func signTypedData(_ typedData: TypedData) async throws -> [UInt8]
-    func simulateTransactions(_ transactions: [Transaction], _ simulateOptions: SimulateTransactionOptions?) async throws -> SimulateResult
-    func switchChain(_ chainId: UInt64) throws
-    func waitForTransaction(_ txHash: String) async throws -> TransactionReceipt?
+    func sendSignedTransactions(execute: Execute) async throws -> String
+    func sendTransactions(transactions: [Transaction], options: SendingTransactionOptions?) async throws -> String
+    func signHash(hash: [UInt8]) async throws -> [UInt8]
+    func signMessage(message: [UInt8]) async throws -> [UInt8]
+    func signTransactions(transactions: [Transaction], options: SendingTransactionOptions?) async throws -> Execute
+    func signTypedData(typedData: TypedData) async throws -> [UInt8]
+    func simulateTransactions(transactions: [Transaction], simulateOptions: SimulateTransactionOptions?) async throws -> SimulateResult
+    func switchChain(chainId: UInt64) throws
+    func waitForTransaction(txHash: String) async throws -> TransactionReceipt?
 }
 
 public class SmartAccount: SmartAccountProtocol {
@@ -515,7 +517,30 @@ public class SmartAccount: SmartAccountProtocol {
         }
     }
 
-    public func sendTransactions(_ transactions: [Transaction], _ options: SendingTransactionOptions?) async throws -> String {
+    public func sendSignedTransactions(execute: Execute) async throws -> String {
+        // Suspend the function and call the scaffolding function, passing it a callback handler from
+        // `AsyncTypes.swift`
+        //
+        // Make sure to hold on to a reference to the continuation in the top-level scope so that
+        // it's not freed before the callback is invoked.
+        var continuation: CheckedContinuation<String, Error>? = nil
+        return try await withCheckedThrowingContinuation {
+            continuation = $0
+            try! rustCall {
+                uniffi_shared_fn_method_smartaccount_send_signed_transactions(
+                    self.pointer,
+
+                    FfiConverterTypeExecute.lower(execute),
+                    FfiConverterForeignExecutor.lower(UniFfiForeignExecutor()),
+                    uniffiFutureCallbackHandlerStringTypeSmartAccountError,
+                    &continuation,
+                    $0
+                )
+            }
+        }
+    }
+
+    public func sendTransactions(transactions: [Transaction], options: SendingTransactionOptions?) async throws -> String {
         // Suspend the function and call the scaffolding function, passing it a callback handler from
         // `AsyncTypes.swift`
         //
@@ -539,7 +564,7 @@ public class SmartAccount: SmartAccountProtocol {
         }
     }
 
-    public func signHash(_ hash: [UInt8]) async throws -> [UInt8] {
+    public func signHash(hash: [UInt8]) async throws -> [UInt8] {
         // Suspend the function and call the scaffolding function, passing it a callback handler from
         // `AsyncTypes.swift`
         //
@@ -562,7 +587,7 @@ public class SmartAccount: SmartAccountProtocol {
         }
     }
 
-    public func signMessage(_ message: [UInt8]) async throws -> [UInt8] {
+    public func signMessage(message: [UInt8]) async throws -> [UInt8] {
         // Suspend the function and call the scaffolding function, passing it a callback handler from
         // `AsyncTypes.swift`
         //
@@ -585,7 +610,31 @@ public class SmartAccount: SmartAccountProtocol {
         }
     }
 
-    public func signTypedData(_ typedData: TypedData) async throws -> [UInt8] {
+    public func signTransactions(transactions: [Transaction], options: SendingTransactionOptions?) async throws -> Execute {
+        // Suspend the function and call the scaffolding function, passing it a callback handler from
+        // `AsyncTypes.swift`
+        //
+        // Make sure to hold on to a reference to the continuation in the top-level scope so that
+        // it's not freed before the callback is invoked.
+        var continuation: CheckedContinuation<Execute, Error>? = nil
+        return try await withCheckedThrowingContinuation {
+            continuation = $0
+            try! rustCall {
+                uniffi_shared_fn_method_smartaccount_sign_transactions(
+                    self.pointer,
+
+                    FfiConverterSequenceTypeTransaction.lower(transactions),
+                    FfiConverterOptionTypeSendingTransactionOptions.lower(options),
+                    FfiConverterForeignExecutor.lower(UniFfiForeignExecutor()),
+                    uniffiFutureCallbackHandlerTypeExecuteTypeSmartAccountError,
+                    &continuation,
+                    $0
+                )
+            }
+        }
+    }
+
+    public func signTypedData(typedData: TypedData) async throws -> [UInt8] {
         // Suspend the function and call the scaffolding function, passing it a callback handler from
         // `AsyncTypes.swift`
         //
@@ -608,7 +657,7 @@ public class SmartAccount: SmartAccountProtocol {
         }
     }
 
-    public func simulateTransactions(_ transactions: [Transaction], _ simulateOptions: SimulateTransactionOptions?) async throws -> SimulateResult {
+    public func simulateTransactions(transactions: [Transaction], simulateOptions: SimulateTransactionOptions?) async throws -> SimulateResult {
         // Suspend the function and call the scaffolding function, passing it a callback handler from
         // `AsyncTypes.swift`
         //
@@ -632,7 +681,7 @@ public class SmartAccount: SmartAccountProtocol {
         }
     }
 
-    public func switchChain(_ chainId: UInt64) throws {
+    public func switchChain(chainId: UInt64) throws {
         try
             rustCallWithError(FfiConverterTypeSmartAccountError.lift) {
                 uniffi_shared_fn_method_smartaccount_switch_chain(self.pointer,
@@ -640,7 +689,7 @@ public class SmartAccount: SmartAccountProtocol {
             }
     }
 
-    public func waitForTransaction(_ txHash: String) async throws -> TransactionReceipt? {
+    public func waitForTransaction(txHash: String) async throws -> TransactionReceipt? {
         // Suspend the function and call the scaffolding function, passing it a callback handler from
         // `AsyncTypes.swift`
         //
@@ -703,18 +752,18 @@ public func FfiConverterTypeSmartAccount_lower(_ value: SmartAccount) -> UnsafeM
 }
 
 public protocol SmartAccountBuilderProtocol {
-    func addChainOption(_ chain: UInt64, _ rpcUrl: String, _ httpRelayerUrl: String?) -> SmartAccountBuilder
-    func addEmailGuardianKey(_ emailAddress: String, _ pepper: String, _ roleWeight: RoleWeight) throws -> SmartAccountBuilder
-    func addGuardianKeys(_ keys: [Key]) throws -> SmartAccountBuilder
-    func addOpenIdGuardianKey(_ idToken: String, _ roleWeight: RoleWeight) throws -> SmartAccountBuilder
-    func addOpenIdWithEmailGuardianKey(_ idToken: String, _ emailAddress: String, _ roleWeight: RoleWeight) throws -> SmartAccountBuilder
+    func addChainOption(chain: UInt64, rpcUrl: String, httpRelayerUrl: String?) -> SmartAccountBuilder
+    func addEmailGuardianKey(emailAddress: String, pepper: String, roleWeight: RoleWeight) throws -> SmartAccountBuilder
+    func addGuardianKeys(keys: [Key]) throws -> SmartAccountBuilder
+    func addOpenIdGuardianKey(idToken: String, roleWeight: RoleWeight) throws -> SmartAccountBuilder
+    func addOpenIdWithEmailGuardianKey(idToken: String, emailAddress: String, roleWeight: RoleWeight) throws -> SmartAccountBuilder
     func build() async throws -> SmartAccount
-    func withActiveChain(_ activeChain: UInt64) -> SmartAccountBuilder
-    func withAppId(_ appId: String) -> SmartAccountBuilder
-    func withKeysetJson(_ keysetJson: String) throws -> SmartAccountBuilder
-    func withMasterKey(_ key: Key) throws -> SmartAccountBuilder
-    func withMasterKeySigner(_ signer: Signer, _ roleWeight: RoleWeight?) -> SmartAccountBuilder
-    func withUnipassServerUrl(_ unipassServerUrl: String) -> SmartAccountBuilder
+    func withActiveChain(activeChain: UInt64) -> SmartAccountBuilder
+    func withAppId(appId: String) -> SmartAccountBuilder
+    func withKeysetJson(keysetJson: String) throws -> SmartAccountBuilder
+    func withMasterKey(key: Key) throws -> SmartAccountBuilder
+    func withMasterKeySigner(signer: Signer, roleWeight: RoleWeight?) -> SmartAccountBuilder
+    func withUnipassServerUrl(unipassServerUrl: String) -> SmartAccountBuilder
 }
 
 public class SmartAccountBuilder: SmartAccountBuilderProtocol {
@@ -737,7 +786,7 @@ public class SmartAccountBuilder: SmartAccountBuilderProtocol {
         try! rustCall { uniffi_shared_fn_free_smartaccountbuilder(pointer, $0) }
     }
 
-    public func addChainOption(_ chain: UInt64, _ rpcUrl: String, _ httpRelayerUrl: String?) -> SmartAccountBuilder {
+    public func addChainOption(chain: UInt64, rpcUrl: String, httpRelayerUrl: String?) -> SmartAccountBuilder {
         return try! FfiConverterTypeSmartAccountBuilder.lift(
             try!
                 rustCall {
@@ -749,7 +798,7 @@ public class SmartAccountBuilder: SmartAccountBuilderProtocol {
         )
     }
 
-    public func addEmailGuardianKey(_ emailAddress: String, _ pepper: String, _ roleWeight: RoleWeight) throws -> SmartAccountBuilder {
+    public func addEmailGuardianKey(emailAddress: String, pepper: String, roleWeight: RoleWeight) throws -> SmartAccountBuilder {
         return try FfiConverterTypeSmartAccountBuilder.lift(
             rustCallWithError(FfiConverterTypeSmartAccountError.lift) {
                 uniffi_shared_fn_method_smartaccountbuilder_add_email_guardian_key(self.pointer,
@@ -760,7 +809,7 @@ public class SmartAccountBuilder: SmartAccountBuilderProtocol {
         )
     }
 
-    public func addGuardianKeys(_ keys: [Key]) throws -> SmartAccountBuilder {
+    public func addGuardianKeys(keys: [Key]) throws -> SmartAccountBuilder {
         return try FfiConverterTypeSmartAccountBuilder.lift(
             rustCallWithError(FfiConverterTypeSmartAccountError.lift) {
                 uniffi_shared_fn_method_smartaccountbuilder_add_guardian_keys(self.pointer,
@@ -769,7 +818,7 @@ public class SmartAccountBuilder: SmartAccountBuilderProtocol {
         )
     }
 
-    public func addOpenIdGuardianKey(_ idToken: String, _ roleWeight: RoleWeight) throws -> SmartAccountBuilder {
+    public func addOpenIdGuardianKey(idToken: String, roleWeight: RoleWeight) throws -> SmartAccountBuilder {
         return try FfiConverterTypeSmartAccountBuilder.lift(
             rustCallWithError(FfiConverterTypeSmartAccountError.lift) {
                 uniffi_shared_fn_method_smartaccountbuilder_add_open_id_guardian_key(self.pointer,
@@ -779,7 +828,7 @@ public class SmartAccountBuilder: SmartAccountBuilderProtocol {
         )
     }
 
-    public func addOpenIdWithEmailGuardianKey(_ idToken: String, _ emailAddress: String, _ roleWeight: RoleWeight) throws -> SmartAccountBuilder {
+    public func addOpenIdWithEmailGuardianKey(idToken: String, emailAddress: String, roleWeight: RoleWeight) throws -> SmartAccountBuilder {
         return try FfiConverterTypeSmartAccountBuilder.lift(
             rustCallWithError(FfiConverterTypeSmartAccountError.lift) {
                 uniffi_shared_fn_method_smartaccountbuilder_add_open_id_with_email_guardian_key(self.pointer,
@@ -812,7 +861,7 @@ public class SmartAccountBuilder: SmartAccountBuilderProtocol {
         }
     }
 
-    public func withActiveChain(_ activeChain: UInt64) -> SmartAccountBuilder {
+    public func withActiveChain(activeChain: UInt64) -> SmartAccountBuilder {
         return try! FfiConverterTypeSmartAccountBuilder.lift(
             try!
                 rustCall {
@@ -822,7 +871,7 @@ public class SmartAccountBuilder: SmartAccountBuilderProtocol {
         )
     }
 
-    public func withAppId(_ appId: String) -> SmartAccountBuilder {
+    public func withAppId(appId: String) -> SmartAccountBuilder {
         return try! FfiConverterTypeSmartAccountBuilder.lift(
             try!
                 rustCall {
@@ -832,7 +881,7 @@ public class SmartAccountBuilder: SmartAccountBuilderProtocol {
         )
     }
 
-    public func withKeysetJson(_ keysetJson: String) throws -> SmartAccountBuilder {
+    public func withKeysetJson(keysetJson: String) throws -> SmartAccountBuilder {
         return try FfiConverterTypeSmartAccountBuilder.lift(
             rustCallWithError(FfiConverterTypeSmartAccountError.lift) {
                 uniffi_shared_fn_method_smartaccountbuilder_with_keyset_json(self.pointer,
@@ -841,7 +890,7 @@ public class SmartAccountBuilder: SmartAccountBuilderProtocol {
         )
     }
 
-    public func withMasterKey(_ key: Key) throws -> SmartAccountBuilder {
+    public func withMasterKey(key: Key) throws -> SmartAccountBuilder {
         return try FfiConverterTypeSmartAccountBuilder.lift(
             rustCallWithError(FfiConverterTypeSmartAccountError.lift) {
                 uniffi_shared_fn_method_smartaccountbuilder_with_master_key(self.pointer,
@@ -850,7 +899,7 @@ public class SmartAccountBuilder: SmartAccountBuilderProtocol {
         )
     }
 
-    public func withMasterKeySigner(_ signer: Signer, _ roleWeight: RoleWeight?) -> SmartAccountBuilder {
+    public func withMasterKeySigner(signer: Signer, roleWeight: RoleWeight?) -> SmartAccountBuilder {
         return try! FfiConverterTypeSmartAccountBuilder.lift(
             try!
                 rustCall {
@@ -861,7 +910,7 @@ public class SmartAccountBuilder: SmartAccountBuilderProtocol {
         )
     }
 
-    public func withUnipassServerUrl(_ unipassServerUrl: String) -> SmartAccountBuilder {
+    public func withUnipassServerUrl(unipassServerUrl: String) -> SmartAccountBuilder {
         return try! FfiConverterTypeSmartAccountBuilder.lift(
             try!
                 rustCall {
@@ -1368,11 +1417,13 @@ public func FfiConverterTypeRoleWeight_lower(_ value: RoleWeight) -> RustBuffer 
 
 public struct SendingTransactionOptions {
     public var fee: FeeOption?
+    public var chain: UInt64?
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(fee: FeeOption?) {
+    public init(fee: FeeOption?, chain: UInt64?) {
         self.fee = fee
+        self.chain = chain
     }
 }
 
@@ -1381,23 +1432,29 @@ extension SendingTransactionOptions: Equatable, Hashable {
         if lhs.fee != rhs.fee {
             return false
         }
+        if lhs.chain != rhs.chain {
+            return false
+        }
         return true
     }
 
     public func hash(into hasher: inout Hasher) {
         hasher.combine(fee)
+        hasher.combine(chain)
     }
 }
 
 public struct FfiConverterTypeSendingTransactionOptions: FfiConverterRustBuffer {
     public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> SendingTransactionOptions {
         return try SendingTransactionOptions(
-            fee: FfiConverterOptionTypeFeeOption.read(from: &buf)
+            fee: FfiConverterOptionTypeFeeOption.read(from: &buf),
+            chain: FfiConverterOptionUInt64.read(from: &buf)
         )
     }
 
     public static func write(_ value: SendingTransactionOptions, into buf: inout [UInt8]) {
         FfiConverterOptionTypeFeeOption.write(value.fee, into: &buf)
+        FfiConverterOptionUInt64.write(value.chain, into: &buf)
     }
 }
 
@@ -1462,11 +1519,13 @@ public func FfiConverterTypeSimulateResult_lower(_ value: SimulateResult) -> Rus
 
 public struct SimulateTransactionOptions {
     public var token: String?
+    public var chain: UInt64?
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(token: String?) {
+    public init(token: String?, chain: UInt64?) {
         self.token = token
+        self.chain = chain
     }
 }
 
@@ -1475,23 +1534,29 @@ extension SimulateTransactionOptions: Equatable, Hashable {
         if lhs.token != rhs.token {
             return false
         }
+        if lhs.chain != rhs.chain {
+            return false
+        }
         return true
     }
 
     public func hash(into hasher: inout Hasher) {
         hasher.combine(token)
+        hasher.combine(chain)
     }
 }
 
 public struct FfiConverterTypeSimulateTransactionOptions: FfiConverterRustBuffer {
     public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> SimulateTransactionOptions {
         return try SimulateTransactionOptions(
-            token: FfiConverterOptionString.read(from: &buf)
+            token: FfiConverterOptionString.read(from: &buf),
+            chain: FfiConverterOptionUInt64.read(from: &buf)
         )
     }
 
     public static func write(_ value: SimulateTransactionOptions, into buf: inout [UInt8]) {
         FfiConverterOptionString.write(value.token, into: &buf)
+        FfiConverterOptionUInt64.write(value.chain, into: &buf)
     }
 }
 
@@ -1775,6 +1840,60 @@ public func FfiConverterTypeTypedData_lift(_ buf: RustBuffer) throws -> TypedDat
 public func FfiConverterTypeTypedData_lower(_ value: TypedData) -> RustBuffer {
     return FfiConverterTypeTypedData.lower(value)
 }
+
+// Note that we don't yet support `indirect` for enums.
+// See https://github.com/mozilla/uniffi-rs/issues/396 for further discussion.
+public enum Execute {
+    case bundledExecute(txs: [Transaction], deployTx: Transaction?)
+    case mainExecute(txs: [Transaction], nonce: UInt64, signature: String)
+}
+
+public struct FfiConverterTypeExecute: FfiConverterRustBuffer {
+    typealias SwiftType = Execute
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> Execute {
+        let variant: Int32 = try readInt(&buf)
+        switch variant {
+        case 1: return try .bundledExecute(
+                txs: FfiConverterSequenceTypeTransaction.read(from: &buf),
+                deployTx: FfiConverterOptionTypeTransaction.read(from: &buf)
+            )
+
+        case 2: return try .mainExecute(
+                txs: FfiConverterSequenceTypeTransaction.read(from: &buf),
+                nonce: FfiConverterUInt64.read(from: &buf),
+                signature: FfiConverterString.read(from: &buf)
+            )
+
+        default: throw UniffiInternalError.unexpectedEnumCase
+        }
+    }
+
+    public static func write(_ value: Execute, into buf: inout [UInt8]) {
+        switch value {
+        case let .bundledExecute(txs, deployTx):
+            writeInt(&buf, Int32(1))
+            FfiConverterSequenceTypeTransaction.write(txs, into: &buf)
+            FfiConverterOptionTypeTransaction.write(deployTx, into: &buf)
+
+        case let .mainExecute(txs, nonce, signature):
+            writeInt(&buf, Int32(2))
+            FfiConverterSequenceTypeTransaction.write(txs, into: &buf)
+            FfiConverterUInt64.write(nonce, into: &buf)
+            FfiConverterString.write(signature, into: &buf)
+        }
+    }
+}
+
+public func FfiConverterTypeExecute_lift(_ buf: RustBuffer) throws -> Execute {
+    return try FfiConverterTypeExecute.lift(buf)
+}
+
+public func FfiConverterTypeExecute_lower(_ value: Execute) -> RustBuffer {
+    return FfiConverterTypeExecute.lower(value)
+}
+
+extension Execute: Equatable, Hashable {}
 
 // Note that we don't yet support `indirect` for enums.
 // See https://github.com/mozilla/uniffi-rs/issues/396 for further discussion.
@@ -2143,7 +2262,7 @@ private let UNIFFI_CALLBACK_UNEXPECTED_ERROR: Int32 = 2
 
 public protocol Signer: AnyObject {
     func address() -> String
-    func signMessage(_ message: [UInt8]) throws -> String
+    func signMessage(message: [UInt8]) throws -> String
 }
 
 // The ForeignCallback that is passed to Rust.
@@ -2166,7 +2285,7 @@ private let foreignCallbackCallbackInterfaceSigner: ForeignCallback =
             var reader = createReader(data: Data(bytes: argsData, count: Int(argsLen)))
             func makeCall() throws -> Int32 {
                 let result = try swiftCallbackInterface.signMessage(
-                    FfiConverterSequenceUInt8.read(from: &reader)
+                    message: FfiConverterSequenceUInt8.read(from: &reader)
                 )
                 var writer = [UInt8]()
                 FfiConverterString.write(result, into: &writer)
@@ -2418,6 +2537,27 @@ private struct FfiConverterOptionTypeSimulateTransactionOptions: FfiConverterRus
         switch try readInt(&buf) as Int8 {
         case 0: return nil
         case 1: return try FfiConverterTypeSimulateTransactionOptions.read(from: &buf)
+        default: throw UniffiInternalError.unexpectedOptionalTag
+        }
+    }
+}
+
+private struct FfiConverterOptionTypeTransaction: FfiConverterRustBuffer {
+    typealias SwiftType = Transaction?
+
+    public static func write(_ value: SwiftType, into buf: inout [UInt8]) {
+        guard let value = value else {
+            writeInt(&buf, Int8(0))
+            return
+        }
+        writeInt(&buf, Int8(1))
+        FfiConverterTypeTransaction.write(value, into: &buf)
+    }
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> SwiftType {
+        switch try readInt(&buf) as Int8 {
+        case 0: return nil
+        case 1: return try FfiConverterTypeTransaction.read(from: &buf)
         default: throw UniffiInternalError.unexpectedOptionalTag
         }
     }
@@ -2866,6 +3006,24 @@ private func uniffiFutureCallbackHandlerTypeSimulateResultTypeSmartAccountError(
     }
 }
 
+private func uniffiFutureCallbackHandlerTypeExecuteTypeSmartAccountError(
+    rawContinutation: UnsafeRawPointer,
+    returnValue: RustBuffer,
+    callStatus: RustCallStatus
+) {
+    let continuation = rawContinutation.bindMemory(
+        to: CheckedContinuation<Execute, Error>.self,
+        capacity: 1
+    )
+
+    do {
+        try uniffiCheckCallStatus(callStatus: callStatus, errorHandler: FfiConverterTypeSmartAccountError.lift)
+        try continuation.pointee.resume(returning: FfiConverterTypeExecute.lift(returnValue))
+    } catch {
+        continuation.pointee.resume(throwing: error)
+    }
+}
+
 private func uniffiFutureCallbackHandlerOptionTypeTransactionReceiptTypeSmartAccountError(
     rawContinutation: UnsafeRawPointer,
     returnValue: RustBuffer,
@@ -2920,7 +3078,7 @@ private func uniffiFutureCallbackHandlerSequenceUInt8TypeSmartAccountError(
     }
 }
 
-public func setupTracing(_ filter: String) {
+public func setupTracing(filter: String) {
     try! rustCall {
         uniffi_shared_fn_func_setup_tracing(
             FfiConverterString.lower(filter), $0
@@ -2965,6 +3123,9 @@ private var initializationResult: InitializationResult {
     if uniffi_shared_checksum_method_smartaccount_nonce() != 9274 {
         return InitializationResult.apiChecksumMismatch
     }
+    if uniffi_shared_checksum_method_smartaccount_send_signed_transactions() != 18607 {
+        return InitializationResult.apiChecksumMismatch
+    }
     if uniffi_shared_checksum_method_smartaccount_send_transactions() != 52880 {
         return InitializationResult.apiChecksumMismatch
     }
@@ -2972,6 +3133,9 @@ private var initializationResult: InitializationResult {
         return InitializationResult.apiChecksumMismatch
     }
     if uniffi_shared_checksum_method_smartaccount_sign_message() != 55038 {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if uniffi_shared_checksum_method_smartaccount_sign_transactions() != 43765 {
         return InitializationResult.apiChecksumMismatch
     }
     if uniffi_shared_checksum_method_smartaccount_sign_typed_data() != 20496 {

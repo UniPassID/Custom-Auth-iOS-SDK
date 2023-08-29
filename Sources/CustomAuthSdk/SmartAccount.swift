@@ -7,18 +7,18 @@ public class SmartAccount {
     var builder: Shared.SmartAccountBuilder?
 
     public init(options: SmartAccountOptions) {
-        builder = SmartAccountBuilder().withAppId(options.appId)
+        builder = SmartAccountBuilder().withAppId(appId: options.appId)
 
         if options.masterKeySigner != nil {
-            builder = builder!.withMasterKeySigner(WrapSigner(signer: options.masterKeySigner!), options.masterKeyRoleWeight)
+            builder = builder!.withMasterKeySigner(signer: WrapSigner(signer: options.masterKeySigner!), roleWeight: options.masterKeyRoleWeight)
         }
 
         if options.unipassServerUrl != nil {
-            builder = builder!.withUnipassServerUrl(options.unipassServerUrl!)
+            builder = builder!.withUnipassServerUrl(unipassServerUrl: options.unipassServerUrl!)
         }
 
         options.chainOptions.forEach { element in
-            self.builder = self.builder!.addChainOption(element.chainId.rawValue, element.rpcUrl, element.relayerUrl)
+            self.builder = self.builder!.addChainOption(chain: element.chainId.rawValue, rpcUrl: element.rpcUrl, httpRelayerUrl: element.relayerUrl)
         }
     }
 
@@ -29,7 +29,7 @@ public class SmartAccount {
     }
 
     public func initialize(options: SmartAccountInitOptions) async throws {
-        builder = builder!.withActiveChain(options.chainId.rawValue)
+        builder = builder!.withActiveChain(activeChain: options.chainId.rawValue)
         inner = try await builder?.build()
         builder = nil
     }
@@ -56,83 +56,83 @@ public class SmartAccount {
 
     public func switchChain(chainID: ChainID) throws {
         try requireInit()
-        try inner!.switchChain(chainID.rawValue)
+        try inner!.switchChain(chainId: chainID.rawValue)
     }
 
     public func signMessage(message: String) async throws -> String {
         try requireInit()
-        return String(bytes: try await inner!.signMessage(Array(message.utf8)))
+        return String(bytes: try await inner!.signMessage(message: Array(message.utf8)))
     }
 
     public func signMessage(message: Data) async throws -> String {
         try requireInit()
-        return String(bytes: try await inner!.signMessage(message.bytes))
+        return String(bytes: try await inner!.signMessage(message: message.bytes))
     }
 
     public func signTypedData(typedData: web3.TypedData) async throws -> String {
         try requireInit()
 
-        return String(bytes: try await inner!.signTypedData(typedData.typed_data.typedData))
+        return String(bytes: try await inner!.signTypedData(typedData: typedData.typed_data.typedData))
     }
-    
+
     public func signTypedData(typedData: Shared.TypedData) async throws -> String {
         try requireInit()
 
-        return String(bytes: try await inner!.signTypedData(typedData))
+        return String(bytes: try await inner!.signTypedData(typedData: typedData))
     }
 
     public func simulateTransaction(transaction: Shared.Transaction, options: SimulateTransactionOptions?) async throws -> SimulateResult {
         try requireInit()
 
-        return try await inner!.simulateTransactions([transaction], options)
+        return try await inner!.simulateTransactions(transactions: [transaction], simulateOptions: options)
     }
 
     public func simulateTransaction(transaction: Shared.Transaction) async throws -> SimulateResult {
         try requireInit()
 
-        return try await inner!.simulateTransactions([transaction], nil)
+        return try await inner!.simulateTransactions(transactions: [transaction], simulateOptions: nil)
     }
 
     public func simulateTransactionBatch(transactions: [Shared.Transaction], options: SimulateTransactionOptions?) async throws -> SimulateResult {
         try requireInit()
 
-        return try await inner!.simulateTransactions(transactions, options)
+        return try await inner!.simulateTransactions(transactions: transactions, simulateOptions: options)
     }
 
     public func simulateTransactionBatch(transactions: [Shared.Transaction]) async throws -> SimulateResult {
         try requireInit()
 
-        return try await inner!.simulateTransactions(transactions, nil)
+        return try await inner!.simulateTransactions(transactions: transactions, simulateOptions: nil)
     }
 
     public func sendTransaction(transaction: Shared.Transaction, options: SendingTransactionOptions?) async throws -> String {
         try requireInit()
 
-        return try await inner!.sendTransactions([transaction], options)
+        return try await inner!.sendTransactions(transactions: [transaction], options: options)
     }
 
     public func sendTransaction(transaction: Shared.Transaction) async throws -> String {
         try requireInit()
 
-        return try await inner!.sendTransactions([transaction], nil)
+        return try await inner!.sendTransactions(transactions: [transaction], options: nil)
     }
 
     public func sendTransactionBatch(transactions: [Shared.Transaction], options: SendingTransactionOptions?) async throws -> String {
         try requireInit()
 
-        return try await inner!.sendTransactions(transactions, options)
+        return try await inner!.sendTransactions(transactions: transactions, options: options)
     }
 
     public func sendTransactionBatch(transactions: [Shared.Transaction]) async throws -> String {
         try requireInit()
 
-        return try await inner!.sendTransactions(transactions, nil)
+        return try await inner!.sendTransactions(transactions: transactions, options: nil)
     }
 
     public func waitTransactionReceiptByHash(transactionHash: String) async throws -> Shared.TransactionReceipt? {
         try requireInit()
 
-        return try await inner!.waitForTransaction(transactionHash)
+        return try await inner!.waitForTransaction(txHash: transactionHash)
     }
 
     public func getKeysetJson() throws -> String {
