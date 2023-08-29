@@ -97,3 +97,32 @@ internal class WrapSigner: Shared.Signer {
 public enum SmartAccountError: String, Error{
     case expectedInit = "Expected Smart Account to Initialize"
 }
+
+public struct SendingTransactionOptions {
+    public var fee: FeeOption?
+    public var chain: UInt64?
+
+    // Default memberwise initializers are never public by default, so we
+    // declare one manually.
+    public init(_ fee: FeeOption?,_ chain: UInt64?) {
+        self.fee = fee
+        self.chain = chain
+    }
+
+     public init(_ fee: FeeOption?) {
+        self.fee = fee
+        self.chain = nil
+    }
+}
+
+public struct SimulateTransactionOptions {
+    public var token: String?
+    public var chain: UInt64?
+
+    // Default memberwise initializers are never public by default, so we
+    // declare one manually.
+    public init(_ token: String?, _ chain: UInt64?) {
+        self.token = token
+        self.chain = chain
+    }
+}
