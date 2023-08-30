@@ -9,6 +9,8 @@ import GenericJSON
 @_exported import Shared
 import web3
 
+
+
 public protocol TypedDataExtendable {
     associatedtype T
     var typed_data: T { get }
@@ -29,28 +31,6 @@ public struct TypedDataExtensions<Base> {
 
 extension web3.TypedData: TypedDataExtendable {}
 extension GenericJSON.JSON: TypedDataExtendable {}
-
-public extension TypedDataExtensions where Base == web3.TypedData {
-    var typedData: Shared.TypedData {
-        let domain = base.domain.objectValue
-        let domainChainId = domain?["chainId"]?.doubleValue
-        let chainId = domainChainId == nil ? nil : UInt64(domainChainId!)
-        let typedDomain = Shared.Eip712Domain(name: domain?["name"]?.stringValue, version: domain?["version"]?.stringValue, chainId: chainId, verifyingContract: domain?["verifyingContract"]?.stringValue, salt: domain?["salt"]?.stringValue)
-
-        var typedTypes: [String: [Shared.Eip712DomainType]] = [:]
-        base.types.forEach { key, value in
-            typedTypes[key] = value.map { element in
-                Shared.Eip712DomainType(name: element.name, type: element.type)
-            }
-        }
-
-        var typedMessage: [String: Shared.Value] = [:]
-        base.message.objectValue?.forEach { key, value in
-            typedMessage[key] = value.typed_data.value
-        }
-        return Shared.TypedData(domain: typedDomain, types: typedTypes, primaryType: base.primaryType, message: typedMessage)
-    }
-}
 
 public extension TypedDataExtensions where Base == GenericJSON.JSON {
     var value: Shared.Value {

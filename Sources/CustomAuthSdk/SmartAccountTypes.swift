@@ -33,11 +33,34 @@ public extension Signer{
 
 extension web3.EthereumAccount:Signer{
     public func address() ->String{
-        return self.address.asString()
+        return self.address.value
     }
 
     public func signMessage(message: Data) throws -> String {
-        return try (self as EthereumAccountProtocol).signMessage(message: message)
+        let prefix = "\u{19}Ethereum Signed Message:\n\(String(message.count))"
+        guard var data = prefix.data(using: .ascii) else {
+            throw EthereumAccountError.signError
+        }
+        data.append(message)
+        let hash = data.web3.keccak256
+        
+        guard var signed = try? self.sign(message: hash) else {
+            throw EthereumAccountError.signError
+            
+        }
+        
+        // Check last char (v)
+        guard var last = signed.popLast() else {
+            throw EthereumAccountError.signError
+            
+        }
+        
+        if last < 27 {
+            last += 27
+        }
+        
+        signed.append(last)
+        return signed.web3.hexString
     }
 }
 

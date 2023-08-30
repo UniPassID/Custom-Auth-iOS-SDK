@@ -66,13 +66,7 @@ public class SmartAccount {
 
     public func signMessage(message: Data) async throws -> String {
         try requireInit()
-        return String(bytes: try await inner!.signMessage(message: message.bytes))
-    }
-
-    public func signTypedData(typedData: web3.TypedData) async throws -> String {
-        try requireInit()
-
-        return String(bytes: try await inner!.signTypedData(typedData: typedData.typed_data.typedData))
+        return String(bytes: try await inner!.signMessage(message: Array(message)))
     }
 
     public func signTypedData(typedData: Shared.TypedData) async throws -> String {
