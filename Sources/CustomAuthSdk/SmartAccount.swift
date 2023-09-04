@@ -68,7 +68,13 @@ public class SmartAccount {
         try requireInit()
         return String(bytes: try await inner!.signMessage(message: message.bytes))
     }
-
+    
+    public func signTransactions(transactions: [Transaction], options: SendingTransactionOptions?) async throws -> Execute {
+        try requireInit()
+        
+        return try await inner!.signTransactions(transactions: transactions, options: options != nil ? Shared.SendingTransactionOptions(fee: options!.fee, chain: options!.chain) : nil)
+    }
+    
     public func signTypedData(typedData: web3.TypedData) async throws -> String {
         try requireInit()
 
