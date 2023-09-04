@@ -79,19 +79,15 @@ public struct SmartAccountInitOptions{
 }
 
 public struct SmartAccountInitByKeyOptions {
-    public var chainId: ChainID
     public var key: Key
-    public init(chainId: ChainID, key: Key) {
-        self.chainId = chainId
+    public init(key: Key) {
         self.key = key
     }
 }
 
 public struct SmartAccountInitByKeysetJsonOptions {
-    public var chainId: ChainID
     public var keysetJson: String
-    public init(chainId: ChainID, keysetJson: String) {
-        self.chainId = chainId
+    public init(keysetJson: String) {
         self.keysetJson = keysetJson
     }
 }
