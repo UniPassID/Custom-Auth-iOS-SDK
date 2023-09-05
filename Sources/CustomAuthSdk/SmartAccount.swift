@@ -35,13 +35,13 @@ public class SmartAccount {
     }
 
     public func initialize(options: SmartAccountInitByKeyOptions) async throws {
-        builder = try builder!.withMasterKey(key: options.key)
+        builder = try builder!.withActiveChain(activeChain: options.chainId.rawValue).withMasterKey(key: options.key)
         inner = try await builder?.build()
         builder = nil
     }
     
     public func initialize(options: SmartAccountInitByKeysetJsonOptions) async throws {
-        builder = try builder!.withKeysetJson(keysetJson: options.keysetJson)
+        builder = try builder!.withActiveChain(activeChain: options.chainId.rawValue).withKeysetJson(keysetJson: options.keysetJson)
         inner = try await builder?.build()
         builder = nil
     }
