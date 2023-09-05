@@ -78,6 +78,24 @@ public struct SmartAccountInitOptions{
     }
 }
 
+public struct SmartAccountInitByKeyOptions {
+    public var chainId: ChainID
+    public var key: Key
+    public init(chainId: ChainID, key: Key) {
+        self.chainId = chainId
+        self.key = key
+    }
+}
+
+public struct SmartAccountInitByKeysetJsonOptions {
+    public var chainId: ChainID
+    public var keysetJson: String
+    public init(chainId: ChainID, keysetJson: String) {
+        self.chainId = chainId
+        self.keysetJson = keysetJson
+    }
+}
+
 internal class WrapSigner: Shared.Signer {
     private var signer: Signer
     
