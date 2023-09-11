@@ -5,12 +5,17 @@ import web3
 public class SmartAccount {
     var inner: Shared.SmartAccount?
     var builder: Shared.SmartAccountBuilder?
-
+    var masterKeySigner: WrapSigner?
+    var masterKeyRoleWeight: RoleWeight?
+    
     public init(options: SmartAccountOptions) {
         builder = SmartAccountBuilder().withAppId(appId: options.appId)
 
-        if options.masterKeySigner != nil {
-            builder = builder!.withMasterKeySigner(signer: WrapSigner(signer: options.masterKeySigner!), roleWeight: options.masterKeyRoleWeight)
+        masterKeyRoleWeight = options.masterKeyRoleWeight
+        
+        if let signer = options.masterKeySigner {
+            masterKeySigner = WrapSigner(signer: signer)
+            builder = builder!.withMasterKeySigner(signer: masterKeySigner!, roleWeight: masterKeyRoleWeight)
         }
 
         if options.unipassServerUrl != nil {
@@ -35,13 +40,21 @@ public class SmartAccount {
     }
 
     public func initialize(options: SmartAccountInitByKeyOptions) async throws {
-        builder = try builder!.withActiveChain(activeChain: options.chainId.rawValue).withMasterKey(key: options.key)
+        var keys = options.keys
+        if masterKeySigner == nil {
+            let masterKey = keys.removeFirst()
+            builder = try? builder?.withMasterKey(key: masterKey)
+        }
+        builder = try builder?.addGuardianKeys(keys: keys).withActiveChain(activeChain: options.chainId.rawValue)
         inner = try await builder?.build()
         builder = nil
     }
     
     public func initialize(options: SmartAccountInitByKeysetJsonOptions) async throws {
         builder = try builder!.withActiveChain(activeChain: options.chainId.rawValue).withKeysetJson(keysetJson: options.keysetJson)
+        if let signer = masterKeySigner {
+            builder = builder?.withMasterKeySigner(signer: signer, roleWeight: masterKeyRoleWeight)
+        }
         inner = try await builder?.build()
         builder = nil
     }
