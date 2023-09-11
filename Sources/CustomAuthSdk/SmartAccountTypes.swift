@@ -80,10 +80,10 @@ public struct SmartAccountInitOptions{
 
 public struct SmartAccountInitByKeyOptions {
     public var chainId: ChainID
-    public var key: Key
-    public init(chainId: ChainID, key: Key) {
+    public var keys: [Key]
+    public init(chainId: ChainID, keys: [Key]) {
         self.chainId = chainId
-        self.key = key
+        self.keys = keys
     }
 }
 
