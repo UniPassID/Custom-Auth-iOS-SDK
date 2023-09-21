@@ -10,12 +10,30 @@
       }
     },
     {
+      "identity" : "faswiftui",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mattmaddux/FASwiftUI",
+      "state" : {
+        "revision" : "2e043ec545724b56df7117829f08344da4b00031",
+        "version" : "1.0.4"
+      }
+    },
+    {
       "identity" : "generic-json-swift",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/iwill/generic-json-swift",
       "state" : {
         "revision" : "0a06575f4038b504e78ac330913d920f1630f510",
         "version" : "2.0.2"
+      }
+    },
+    {
+      "identity" : "qgrid",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Q-Mobile/QGrid",
+      "state" : {
+        "revision" : "804e59f8cb9f66b226685e9369fb82029742b83a",
+        "version" : "0.1.4"
       }
     },
     {
