@@ -23,6 +23,7 @@ let package = Package(
     // Dependencies declare other packages that this package depends on.
     // .package(url: /* package url */, from: "1.0.0"),
     .package(url: "https://github.com/argentlabs/web3.swift", from: "1.1.0")
+    .package(url: "https://github.com/mattmaddux/FASwiftUI", from: "1.0.4")
   ],
   targets: [
     // Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -30,5 +31,6 @@ let package = Package(
     .binaryTarget(name: "SharedFFI", url: url,checksum: checksum ),
     .target(name: "Shared", dependencies: [.target(name: "SharedFFI")]),
     .target(name: "CustomAuthSdk", dependencies: [.target(name: "Shared"), "web3.swift"]),
+    .target(name: "PackageName", dependencies: ["FASwiftUI"],),
   ]
 )
