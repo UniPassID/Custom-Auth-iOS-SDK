@@ -31,6 +31,6 @@ let package = Package(
     .binaryTarget(name: "SharedFFI", url: url,checksum: checksum ),
     .target(name: "Shared", dependencies: [.target(name: "SharedFFI")]),
     .target(name: "CustomAuthSdk", dependencies: [.target(name: "Shared"), "web3.swift"]),
-    .target(name: "PackageName", dependencies: ["FASwiftUI"],),
+    .target(name: "PackageName", dependencies: ["FASwiftUI"]),
   ]
 )
